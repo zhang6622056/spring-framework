@@ -1,0 +1,1 @@
+<bean id="userService" class="beans.UserService"></bean>

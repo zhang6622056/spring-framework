@@ -10,6 +10,7 @@ dependencyManagement {
 
 dependencies {
 	compile(project(":spring-core"))
+	compile(project(":spring-websocket"))
 	optional(project(":spring-aop"))
 	optional(project(":spring-beans"))
 	optional(project(":spring-context"))
@@ -19,7 +20,6 @@ dependencies {
 	optional(project(":spring-web"))
 	optional(project(":spring-webflux"))
 	optional(project(":spring-webmvc"))
-	optional(project(":spring-websocket"))
 	optional("javax.activation:javax.activation-api:1.2.0")
 	optional("javax.el:javax.el-api:3.0.1-b04")
 	optional("javax.inject:javax.inject:1")

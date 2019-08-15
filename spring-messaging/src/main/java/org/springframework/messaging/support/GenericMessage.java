@@ -76,10 +76,12 @@ public class GenericMessage<T> implements Message<T>, Serializable {
 	}
 
 
+	@Override
 	public T getPayload() {
 		return this.payload;
 	}
 
+	@Override
 	public MessageHeaders getHeaders() {
 		return this.headers;
 	}
