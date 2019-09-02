@@ -26,7 +26,6 @@ public class BeanLoadTest {
 		annotationConfigApplicationContext.refresh();
 		UserService userService = (UserService) annotationConfigApplicationContext.getBean("userService");
 		System.out.println(userService.getUserName());
-
 	}
 
 

@@ -197,18 +197,19 @@ public class AnnotatedBeanDefinitionReader {
 		doRegisterBean(annotatedClass, null, name, qualifiers);
 	}
 
-	/**
-	 * Register a bean from the given bean class, deriving its metadata from
-	 * class-declared annotations.
-	 * @param annotatedClass the class of the bean
-	 * @param instanceSupplier a callback for creating an instance of the bean
-	 * (may be {@code null})
-	 * @param name an explicit name for the bean
-	 * @param qualifiers specific qualifier annotations to consider, if any,
-	 * in addition to qualifiers at the bean class level
-	 * @param definitionCustomizers one or more callbacks for customizing the
-	 * factory's {@link BeanDefinition}, e.g. setting a lazy-init or primary flag
-	 * @since 5.0
+
+
+	/***
+	 *
+	 * 将注解转换为beandefinition的格式
+	 * @author Nero
+	 * @date 2019-08-16
+	 * *@param: annotatedClass 被解析的注解类
+	 *@param: instanceSupplier
+	 *@param: name
+	 *@param: qualifiers
+	 *@param: definitionCustomizers
+	 * @return void
 	 */
 	<T> void doRegisterBean(Class<T> annotatedClass, @Nullable Supplier<T> instanceSupplier, @Nullable String name,
 			@Nullable Class<? extends Annotation>[] qualifiers, BeanDefinitionCustomizer... definitionCustomizers) {
