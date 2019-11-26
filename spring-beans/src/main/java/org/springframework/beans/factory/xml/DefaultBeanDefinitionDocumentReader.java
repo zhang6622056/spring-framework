@@ -186,6 +186,18 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 	}
 
+
+
+
+	/***
+	 *
+	 * 解析xmlbean标签
+	 * @author Nero
+	 * @date 2019-11-26
+	 * *@param: ele
+	*@param: delegate
+	 * @return void
+	 */
 	private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate delegate) {
 		if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
 			importBeanDefinitionResource(ele);

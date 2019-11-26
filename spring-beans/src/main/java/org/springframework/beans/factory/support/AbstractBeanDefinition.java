@@ -140,65 +140,95 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	@Nullable
 	private volatile Object beanClass;
 
+	//- 该bean的作用范围
 	@Nullable
 	private String scope = SCOPE_DEFAULT;
 
+	//- 是否有继承父类
 	private boolean abstractFlag = false;
 
+	//- 是否延迟初始化
 	private boolean lazyInit = false;
 
+	//- TODO-ZL 自动注入类型
 	private int autowireMode = AUTOWIRE_NO;
 
+	//- TODO-ZL 依赖检查
 	private int dependencyCheck = DEPENDENCY_CHECK_NONE;
 
+	//- 依赖，需要前置的实例化bean
 	@Nullable
 	private String[] dependsOn;
 
+	//- TODO-ZL ?
 	private boolean autowireCandidate = true;
 
+	//- TODO-ZL ?
 	private boolean primary = false;
 
+	//- TODO-ZL ?
 	private final Map<String, AutowireCandidateQualifier> qualifiers = new LinkedHashMap<>();
 
+
+	//- TODO-ZL ?
 	@Nullable
 	private Supplier<?> instanceSupplier;
 
+	//- TODO-ZL ?
 	private boolean nonPublicAccessAllowed = true;
 
+	//- TODO-ZL ?
 	private boolean lenientConstructorResolution = true;
 
+
+	//- TODO-ZL ?
 	@Nullable
 	private String factoryBeanName;
 
+	//- TODO-ZL ?
 	@Nullable
 	private String factoryMethodName;
 
+	//- TODO-ZL ?
 	@Nullable
 	private ConstructorArgumentValues constructorArgumentValues;
 
+	//- TODO-ZL ?
 	@Nullable
 	private MutablePropertyValues propertyValues;
 
+	//- TODO-ZL ?
 	@Nullable
 	private MethodOverrides methodOverrides;
 
+	//- 初始化时候执行的方法
 	@Nullable
 	private String initMethodName;
 
+	//- bean销毁的时候执行的方法
 	@Nullable
 	private String destroyMethodName;
 
+	//- 是否执行初始化方法
 	private boolean enforceInitMethod = true;
 
+	//- 是否执行销毁方法
 	private boolean enforceDestroyMethod = true;
 
+
+	//- TODO-ZL
 	private boolean synthetic = false;
 
+
+	//- TODO-ZL
 	private int role = BeanDefinition.ROLE_APPLICATION;
 
+	//- 描述字段
 	@Nullable
 	private String description;
 
+
+	//- 源文件，FileSystemResource
 	@Nullable
 	private Resource resource;
 

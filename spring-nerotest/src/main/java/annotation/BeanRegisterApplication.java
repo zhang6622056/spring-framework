@@ -1,4 +1,4 @@
-package bean.annotation;
+package annotation;
 
 import beans.UserService;
 import org.springframework.context.annotation.Bean;

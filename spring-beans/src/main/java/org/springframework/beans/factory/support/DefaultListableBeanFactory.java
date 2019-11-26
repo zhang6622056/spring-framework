@@ -157,6 +157,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private final Map<Class<?>, Object> resolvableDependencies = new ConcurrentHashMap<>(16);
 
 	/** Map of bean definition objects, keyed by bean name. */
+	//- 加入bean第一步,缓存。resource->inputstream->reader->BeanDefinition
 	private final Map<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>(256);
 
 	/** Map of singleton and non-singleton bean names, keyed by dependency type. */
@@ -871,6 +872,18 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	// Implementation of BeanDefinitionRegistry interface
 	//---------------------------------------------------------------------
 
+	
+	
+	
+	/***
+	 *
+	 * 注册bean的实现
+	 * @author Nero
+	 * @date 2019-11-26
+	 * *@param: beanName   声明的beanId
+	*@param: beanDefinition
+	 * @return void
+	 */
 	@Override
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
@@ -888,6 +901,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			}
 		}
 
+
+		//- 已经在缓存中存在
 		BeanDefinition existingDefinition = this.beanDefinitionMap.get(beanName);
 		if (existingDefinition != null) {
 			if (!isAllowBeanDefinitionOverriding()) {
@@ -916,8 +931,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 			}
 			this.beanDefinitionMap.put(beanName, beanDefinition);
-		}
-		else {
+		}else {
+
+			//- 在创建之中
 			if (hasBeanCreationStarted()) {
 				// Cannot modify startup-time collection elements anymore (for stable iteration)
 				synchronized (this.beanDefinitionMap) {
@@ -932,9 +948,8 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						this.manualSingletonNames = updatedSingletons;
 					}
 				}
-			}
-			else {
-				// Still in startup registration phase
+			}else {
+				//- 在启动注册阶段，则放入map缓存中
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				this.beanDefinitionNames.add(beanName);
 				this.manualSingletonNames.remove(beanName);
