@@ -205,14 +205,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Nullable
 	private MessageSource messageSource;
 
-	/** Helper class used in event publishing. */
+	//- 事件广播器
 	@Nullable
 	private ApplicationEventMulticaster applicationEventMulticaster;
 
-	/** Statically specified listeners. */
+	//- 容器的listener 缓存
 	private final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
-	/** ApplicationEvents published early. */
+	//- 尽早的事件，暂时不明是哪些事件
 	@Nullable
 	private Set<ApplicationEvent> earlyApplicationEvents;
 
@@ -491,6 +491,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		return this.beanFactoryPostProcessors;
 	}
 
+
+
+	/***
+	 *
+	 * 添加容器的事件监听
+	 * @author Nero
+	 * @date 2019-12-18
+	 * *@param: listener
+	 * @return void
+	 */
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		Assert.notNull(listener, "ApplicationListener must not be null");
@@ -510,41 +520,43 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
-			// Prepare this context for refreshing.
+			//- 将占位符的配置，加载到Environment中
 			prepareRefresh();
 
-			// Tell the subclass to refresh the internal bean factory.
+			//- 加载定义的BeanDefinition对象到容器中
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
-			// Prepare the bean factory for use in this context.
+			//- 容器级别的设置
+			//- beanFactory设置ignoreDependencyInterface为一些Aware接口
+			//- beanFactory设置registerResolvableDependency
 			prepareBeanFactory(beanFactory);
 
 			try {
-				// Allows post-processing of the bean factory in context subclasses.
+				//- 设置一些BeanPostProcesser for beanFactory
 				postProcessBeanFactory(beanFactory);
 
-				// Invoke factory processors registered as beans in the context.
+				//- 调用容器的后置处理器，包括BeanDefinitionRegistryPostProcessor
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
+				//- 缓存处理器到AbstractBeanFactory.beanPostProcessors
 				registerBeanPostProcessors(beanFactory);
 
-				// Initialize message source for this context.
+				//- 国际化，暂时不予理会
 				initMessageSource();
 
-				// Initialize event multicaster for this context.
+				//- 注册一个SimpleApplicationEventMulticaster 单例到容器中
 				initApplicationEventMulticaster();
 
-				// Initialize other special beans in specific context subclasses.
+				//- 调用子类的刷新，由子类实现
 				onRefresh();
 
-				// Check for listener beans and register them.
+				//- 注册监听器，从容器bean中查找
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.
+				//- 设置转换器相关...
 				finishBeanFactoryInitialization(beanFactory);
 
-				// Last step: publish corresponding event.
+				//- 发布刷新完成的事件等等。。。
 				finishRefresh();
 			}
 
@@ -590,11 +602,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 
-		// Initialize any placeholder property sources in the context environment
+		// - 初始化占位符到Environment中
 		initPropertySources();
 
-		// Validate that all properties marked as required are resolvable
-		// see ConfigurablePropertyResolver#setRequiredProperties
+		//- 验证必要的属性
 		getEnvironment().validateRequiredProperties();
 
 		// Allow for the collection of early ApplicationEvents,
@@ -750,10 +761,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 	}
 
-	/**
-	 * Initialize the ApplicationEventMulticaster.
-	 * Uses SimpleApplicationEventMulticaster if none defined in the context.
-	 * @see org.springframework.context.event.SimpleApplicationEventMulticaster
+
+
+	/***
+	 *
+	 * 为spring上下文初始化一个事件广播器
+	 * @author Nero
+	 * @date 2019-12-18
+	 * *@param:
+	 * @return void
 	 */
 	protected void initApplicationEventMulticaster() {
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
@@ -773,6 +789,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 	}
+
+
 
 	/**
 	 * Initialize the LifecycleProcessor.
@@ -816,19 +834,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * Doesn't affect other listeners, which can be added without being beans.
 	 */
 	protected void registerListeners() {
-		// Register statically specified listeners first.
+		//- 将AbstractApplicationContext 中缓存的listener 添加到广播器中
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
-		// Do not initialize FactoryBeans here: We need to leave all regular beans
-		// uninitialized to let post-processors apply to them!
+		//- 将容器中的bean添加到广播器中
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);
 		}
 
-		// Publish early application events now that we finally have a multicaster...
+		//- 发布earlly Event
 		Set<ApplicationEvent> earlyEventsToProcess = this.earlyApplicationEvents;
 		this.earlyApplicationEvents = null;
 		if (earlyEventsToProcess != null) {
@@ -843,16 +860,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * initializing all remaining singleton beans.
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-		// Initialize conversion service for this context.
+		//- 初始化当前上下文的转换器
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
 					beanFactory.getBean(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class));
 		}
 
-		// Register a default embedded value resolver if no bean post-processor
-		// (such as a PropertyPlaceholderConfigurer bean) registered any before:
-		// at this point, primarily for resolution in annotation attribute values.
+		//- 设置EmbeddedValueResolver
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
@@ -888,7 +903,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Propagate refresh to lifecycle processor first.
 		getLifecycleProcessor().onRefresh();
 
-		// Publish the final event.
+		//- 发布刷新完成的事件
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.

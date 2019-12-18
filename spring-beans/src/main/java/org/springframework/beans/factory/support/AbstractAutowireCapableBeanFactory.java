@@ -450,10 +450,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	// Implementation of relevant AbstractBeanFactory template methods
 	//---------------------------------------------------------------------
 
+
 	/**
-	 * Central method of this class: creates a bean instance,
-	 * populates the bean instance, applies post-processors, etc.
-	 * @see #doCreateBean
+	 *
+	 * 创建一个springbean
+	 * @author Nero
+	 * @date 2019-12-18
+	 * @param: beanName
+	 * @param: mbd
+	 * @param: args
+	 * @return java.lang.Object
 	 */
 	@Override
 	protected Object createBean(String beanName, RootBeanDefinition mbd, @Nullable Object[] args)
